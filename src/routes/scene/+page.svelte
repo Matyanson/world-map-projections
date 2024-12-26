@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import * as THREE from "three";
+    import vertexShader from "$lib/shaders/vertex.glsl";
+    import fragmentShader from "$lib/shaders/fragment.glsl";
 
 
     let canvas: HTMLCanvasElement;
@@ -24,9 +26,15 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setAnimationLoop( animate );
 
-        const geometry = new THREE.SphereGeometry(0.5, 50, 50);
-        const material = new THREE.MeshBasicMaterial({
-            map: new THREE.TextureLoader().load('earth_day.jpg')
+        const geometry = new THREE.SphereGeometry(0.5, 500, 500);
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+                globeTexture: {
+                    value: new THREE.TextureLoader().load('earth_day.jpg')
+                }
+            }
         });
         sphere = new THREE.Mesh( geometry, material );
         scene.add( sphere );
