@@ -12,6 +12,14 @@
     let camera: THREE.Camera;
     let renderer: THREE.WebGLRenderer;
     let sphere: THREE.Mesh;
+    let uniforms: {
+        globeTexture: {
+            value: THREE.Texture;
+        },
+        cursorPosition: {
+            value: THREE.Vector2;
+        }
+    }
 
     onMount(()=>{
         createScene();
@@ -28,14 +36,18 @@
         renderer.setAnimationLoop( animate );
 
         const geometry = new THREE.SphereGeometry(0.5, 50, 50);
+        uniforms = {
+            globeTexture: {
+                value: new THREE.TextureLoader().load('earth_day.jpg')
+            },
+            cursorPosition: {
+                value: new THREE.Vector2(0, 0)
+            }
+        }
         const material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader,
-            uniforms: {
-                globeTexture: {
-                    value: new THREE.TextureLoader().load('earth_day.jpg')
-                }
-            }
+            uniforms
         });
         sphere = new THREE.Mesh( geometry, material );
         scene.add( sphere );
@@ -44,16 +56,16 @@
     }
 
     function animate() {
-
-        sphere.rotation.x = 8 * m.y - 4;
-        sphere.rotation.y = 8 * m.x - 4;
-
         renderer.render( scene, camera );
     }
 
     function onMouseMove(e: MouseEvent) {
+        // Normalize mouse position
         m.x = e.clientX / window.innerWidth;
         m.y = e.clientY / window.innerHeight;
+
+        // Update the cursorPosition uniform
+        uniforms.cursorPosition.value.set(m.x, m.y);
     }
 
 
