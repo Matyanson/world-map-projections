@@ -35,7 +35,7 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setAnimationLoop( animate );
 
-        const geometry = new THREE.SphereGeometry(0.5, 50, 50);
+        const geometry = new THREE.SphereGeometry(1, 50, 50);
         uniforms = {
             globeTexture: {
                 value: new THREE.TextureLoader().load('earth_day.jpg')
@@ -49,10 +49,10 @@
             fragmentShader,
             uniforms
         });
-        sphere = new THREE.Mesh( geometry, material );
-        scene.add( sphere );
+        sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
 
-        camera.position.z = 1;
+        camera.position.z = 2;
     }
 
     function animate() {
