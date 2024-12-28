@@ -5,7 +5,9 @@
     import fragmentShader from "$lib/shaders/fragment.glsl";
 
 
-    let m: {x: number, y: number} = {x: 0, y: 0};
+    let m: {x: number, y: number} = {x: 0.5, y: 0.5};
+    let mOffset: {x: number, y: number} = {x: 0, y: 0};
+    let mIsDown: boolean = false;
     let canvas: HTMLCanvasElement;
 
     let scene: THREE.Scene;
@@ -41,7 +43,7 @@
                 value: new THREE.TextureLoader().load('earth_day.jpg')
             },
             cursorPosition: {
-                value: new THREE.Vector2(0, 0)
+                value: new THREE.Vector2(0.5, 0.5)
             }
         }
         const material = new THREE.ShaderMaterial({
@@ -60,12 +62,33 @@
     }
 
     function onMouseMove(e: MouseEvent) {
-        // Normalize mouse position
-        m.x = e.clientX / window.innerWidth;
-        m.y = e.clientY / window.innerHeight;
+        if(mIsDown) {
+            // Normalize mouse position
+            m.x = -e.clientX / window.innerWidth;
+            m.y = -e.clientY / window.innerHeight;
 
-        // Update the cursorPosition uniform
-        uniforms.cursorPosition.value.set(m.x, m.y);
+            // Update the cursorPosition uniform
+            uniforms.cursorPosition.value.set(m.x + mOffset.x, m.y + mOffset.y);
+        }
+    }
+
+    function onMouseDown(e: MouseEvent) {
+        if(e.button == 0) {
+            mIsDown = true;
+
+            const x = -e.clientX / window.innerWidth;
+            const y = -e.clientY / window.innerHeight;
+
+            // difference between last and curr coords
+            mOffset.x += m.x - x;
+            mOffset.y += m.y - y;
+        }
+    }
+
+    function onMouseUp(e: MouseEvent) {
+        if(e.button == 0) {
+            mIsDown = false;
+        }
     }
 
 
@@ -74,4 +97,8 @@
 
 <canvas bind:this={canvas}></canvas>
 
-<svelte:window on:mousemove={onMouseMove}></svelte:window>
+<svelte:window 
+    on:mousemove={onMouseMove} 
+    on:mousedown={onMouseDown}
+    on:mouseup={onMouseUp}
+></svelte:window>
