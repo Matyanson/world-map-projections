@@ -67,8 +67,14 @@
             m.x = -e.clientX / window.innerWidth;
             m.y = -e.clientY / window.innerHeight;
 
+            // cursor (convert to uv space)
+            const cursorX =      m.x + mOffset.x;
+            const cursorY = 1 - (m.y + mOffset.y);
+
+            console.log(cursorX, cursorY);
+
             // Update the cursorPosition uniform
-            uniforms.cursorPosition.value.set(m.x + mOffset.x, m.y + mOffset.y);
+            uniforms.cursorPosition.value.set(cursorX, cursorY);
         }
     }
 
@@ -77,7 +83,7 @@
             mIsDown = true;
 
             const x = -e.clientX / window.innerWidth;
-            const y = -e.clientY / window.innerHeight;
+            let y = -e.clientY / window.innerHeight;
 
             // difference between last and curr coords
             mOffset.x += m.x - x;
