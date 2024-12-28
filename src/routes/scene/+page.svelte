@@ -43,7 +43,7 @@
                 value: new THREE.TextureLoader().load('earth_day.jpg')
             },
             cursorPosition: {
-                value: new THREE.Vector2(0.5, 0.5)
+                value: new THREE.Vector2(m.x, 1 - m.y)
             }
         }
         const material = new THREE.ShaderMaterial({
@@ -83,7 +83,7 @@
             mIsDown = true;
 
             const x = -e.clientX / window.innerWidth;
-            let y = -e.clientY / window.innerHeight;
+            const y = -e.clientY / window.innerHeight;
 
             // difference between last and curr coords
             mOffset.x += m.x - x;
