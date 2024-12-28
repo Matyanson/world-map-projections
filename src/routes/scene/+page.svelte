@@ -54,7 +54,7 @@
         sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
 
-        camera.position.z = 2;
+        camera.position.z = 1.5;
     }
 
     function animate() {

@@ -1,7 +1,7 @@
 uniform vec2 cursorPosition;
 
 out vec2 vUV;
-out vec3 fragPosition;
+out vec3 fragPositionA;
 
 vec3 mapProjectionA(vec2 uv) {
     return position;
@@ -63,8 +63,8 @@ void main() {
 
     vUV = uv;
 
-    vec4 viewPosition = mapModelMatA * vec4(mappedPositionA, 1.0);
-    // vec4 viewPosition = mapModelMatB * vec4(mappedPositionB, 1.0);
-    fragPosition = vec3(viewPosition);
-    gl_Position = projectionMatrix * viewMatrix * viewPosition;
+    vec4 viewPositionA = mapModelMatA * vec4(mappedPositionA, 1.0);
+    vec4 viewPositionB = mapModelMatB * vec4(mappedPositionB, 1.0);
+    fragPositionA = vec3(viewPositionA);
+    gl_Position = projectionMatrix * viewMatrix * viewPositionA;
 }

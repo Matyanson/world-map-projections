@@ -2,13 +2,7 @@ uniform sampler2D globeTexture;
 uniform vec2 cursorPosition;
 
 in vec2 vUV;
-in vec3 fragPosition;
-
-float getDist(vec2 a, vec2 b) {
-    vec2 d = abs(a - b);
-    d = min(d, 1.0 - d);
-    return length(d);
-}
+in vec3 fragPositionA;
 
 float getDistOnGlobe(vec3 a, vec3 b) {
     float dotProduct = dot(normalize(a), normalize(b));
@@ -20,7 +14,7 @@ void main() {
     vec3 cursor3D = vec3(0.0, 0.0, 1.0);
     vec4 color = texture2D(globeTexture, vUV);
 
-    if(getDistOnGlobe(cursor3D, fragPosition) < 0.025) {
+    if(getDistOnGlobe(cursor3D, fragPositionA) < 0.025) {
         gl_FragColor = mix(color, vec4(1.0, 0.0, 0.0, 1.0), 0.5);
     }
     else {
