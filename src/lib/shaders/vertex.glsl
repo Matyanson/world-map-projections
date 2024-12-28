@@ -1,4 +1,5 @@
 uniform vec2 cursorPosition;
+uniform float transition;
 
 out vec2 vUV;
 out vec3 fragPositionA;
@@ -66,5 +67,9 @@ void main() {
     vec4 viewPositionA = mapModelMatA * vec4(mappedPositionA, 1.0);
     vec4 viewPositionB = mapModelMatB * vec4(mappedPositionB, 1.0);
     fragPositionA = vec3(viewPositionA);
-    gl_Position = projectionMatrix * viewMatrix * viewPositionA;
+
+    // Interpolate between viewPositionA and viewPositionB
+    vec4 viewPosition = mix(viewPositionA, viewPositionB, transition);
+
+    gl_Position = projectionMatrix * viewMatrix * viewPosition;
 }

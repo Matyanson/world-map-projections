@@ -8,6 +8,7 @@
     let m: {x: number, y: number} = {x: 0.5, y: 0.5};
     let mOffset: {x: number, y: number} = {x: 0, y: 0};
     let mIsDown: boolean = false;
+    let transition = 0;
     let canvas: HTMLCanvasElement;
 
     let scene: THREE.Scene;
@@ -20,6 +21,9 @@
         },
         cursorPosition: {
             value: THREE.Vector2;
+        },
+        transition: {
+            value: number;
         }
     }
 
@@ -44,6 +48,9 @@
             },
             cursorPosition: {
                 value: new THREE.Vector2(m.x, 1 - m.y)
+            },
+            transition: {
+                value: transition
             }
         }
         const material = new THREE.ShaderMaterial({
@@ -54,7 +61,7 @@
         sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
 
-        camera.position.z = 1.5;
+        camera.position.z = 2.0;
     }
 
     function animate() {
@@ -70,8 +77,6 @@
             // cursor (convert to uv space)
             const cursorX =      m.x + mOffset.x;
             const cursorY = 1 - (m.y + mOffset.y);
-
-            console.log(cursorX, cursorY);
 
             // Update the cursorPosition uniform
             uniforms.cursorPosition.value.set(cursorX, cursorY);
@@ -97,14 +102,18 @@
         }
     }
 
+    function onTransition() {
+        uniforms.transition.value = transition;
+    }
+
 
 
 </script>
 
-<canvas bind:this={canvas}></canvas>
-
-<svelte:window 
+<canvas 
+    bind:this={canvas}
     on:mousemove={onMouseMove} 
     on:mousedown={onMouseDown}
     on:mouseup={onMouseUp}
-></svelte:window>
+></canvas>
+<input type="range" min="0" max="1" step="0.01" bind:value={transition} on:input={onTransition} /> {transition}
