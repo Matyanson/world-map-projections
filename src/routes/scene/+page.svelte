@@ -5,14 +5,14 @@
     import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
     import fragmentShader from "$lib/shaders/fragment.glsl";
     import { defaultValue, insertID, values } from "$lib/projections/index";
+    import { createMouseController } from "$lib/mouseControler";
 
 
-    let m: {x: number, y: number} = {x: 0.5, y: 0.5};
-    let mOffset: {x: number, y: number} = {x: 0, y: 0};
-    let mIsDown: boolean = false;
     let transition = 0;
     let projectionIndex = 0;
     let canvas: HTMLCanvasElement;
+
+    const mouseController = createMouseController(0.5, 0.5);
 
     let scene: THREE.Scene;
     let camera: THREE.Camera;
@@ -32,6 +32,11 @@
 
     onMount(()=>{
         createScene();
+
+        mouseController.mouseState.subscribe((state) => {
+            const cursor = mouseController.getCursorPosition();
+            uniforms.cursorPosition.value.set(cursor.x, cursor.y);
+        })
     })
 
     $: updateShaders(projectionIndex);
@@ -80,12 +85,13 @@
         renderer.setAnimationLoop( animate );
 
         const geometry = new THREE.SphereGeometry(1, 50, 50);
+        const cursor = mouseController.getCursorPosition();
         uniforms = {
             globeTexture: {
                 value: new THREE.TextureLoader().load('earth_day.jpg')
             },
             cursorPosition: {
-                value: new THREE.Vector2(m.x, 1 - m.y)
+                value: new THREE.Vector2(cursor.x, cursor.y)
             },
             transition: {
                 value: transition
@@ -104,40 +110,6 @@
 
     function animate() {
         renderer.render( scene, camera );
-    }
-
-    function onMouseMove(e: MouseEvent) {
-        if(mIsDown) {
-            // Normalize mouse position
-            m.x = -e.clientX / window.innerWidth;
-            m.y = -e.clientY / window.innerHeight;
-
-            // cursor (convert to uv space)
-            const cursorX =      m.x + mOffset.x;
-            const cursorY = 1 - (m.y + mOffset.y);
-
-            // Update the cursorPosition uniform
-            uniforms.cursorPosition.value.set(cursorX, cursorY);
-        }
-    }
-
-    function onMouseDown(e: MouseEvent) {
-        if(e.button == 0) {
-            mIsDown = true;
-
-            const x = -e.clientX / window.innerWidth;
-            const y = -e.clientY / window.innerHeight;
-
-            // difference between last and curr coords
-            mOffset.x += m.x - x;
-            mOffset.y += m.y - y;
-        }
-    }
-
-    function onMouseUp(e: MouseEvent) {
-        if(e.button == 0) {
-            mIsDown = false;
-        }
     }
 
     function onTransition() {
@@ -159,8 +131,8 @@
 </select> {projectionIndex} {values[projectionIndex].name}
 <canvas 
     bind:this={canvas}
-    on:mousemove={onMouseMove} 
-    on:mousedown={onMouseDown}
-    on:mouseup={onMouseUp}
+    on:mousemove={mouseController.onMouseMove} 
+    on:mousedown={mouseController.onMouseDown}
+    on:mouseup={mouseController.onMouseUp}
     on:wheel|preventDefault={onWheel}
 ></canvas>
