@@ -17,7 +17,7 @@ vec3 projectUVToPositionA(vec2 uv) {
 vec2 applyMapProjectionB(float a, float b) {
 
     float x = a;
-    float y = b;
+    float y = log(1.0 / cos(b) + tan(b));
 
     return vec2(x, y);
 }
@@ -28,7 +28,7 @@ vec3 projectUVToPositionB(vec2 uv) {
     return vec3(xy, 1.0);
 }
 
-mat4 getCursorCenteringMatrixA(vec2 cursor) {
+vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
     vec2 sphereOriginOffset = vec2(-0.25, 0.0);
     vec2 cursorOnSphere = uvToSphericalCoords(cursor - sphereOriginOffset);
 
@@ -50,39 +50,28 @@ mat4 getCursorCenteringMatrixA(vec2 cursor) {
         0.0,         0.0, 0.0,        1.0
     );
 
-    return rotX * rotY;
+    return rotX * rotY * vec4(position, 1.0);
 }
 
-mat4 getCursorCenteringMatrixB(vec2 cursor) {
-    // map cursor according to the map projection function
+vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
     vec3 mappedCursor = projectUVToPositionB(cursor);
-
-    // Compute translation
-    mat4 translation = mat4(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        -mappedCursor.x, -mappedCursor.y, 0.0, 1.0
-    );
-
-    return translation;
+    vec3 newPosition = position - vec3(mappedCursor.xy, 0.0);
+    return vec4(newPosition, 1.0);
 }
 
 void main() {
+    vUV = uv;
+
     vec3 mappedPositionA = projectUVToPositionA(uv);
     vec3 mappedPositionB = projectUVToPositionB(uv);
 
-    mat4 mapModelMatA = getCursorCenteringMatrixA(cursorPosition);
-    mat4 mapModelMatB = getCursorCenteringMatrixB(cursorPosition);
+    vec4 positionA = applyCursorCenteringA(mappedPositionA, cursorPosition);
+    vec4 positionB = applyCursorCenteringB(mappedPositionB, cursorPosition);
 
-    vUV = uv;
+    fragPositionA = vec3(positionA);
 
-    vec4 viewPositionA = mapModelMatA * vec4(mappedPositionA, 1.0);
-    vec4 viewPositionB = mapModelMatB * vec4(mappedPositionB, 1.0);
-    fragPositionA = vec3(viewPositionA);
-
-    // Interpolate between viewPositionA and viewPositionB
-    vec4 viewPosition = mix(viewPositionA, viewPositionB, transition);
+    // Interpolate between positionA and positionB
+    vec4 viewPosition = mix(positionA, positionB, transition);
 
     gl_Position = projectionMatrix * viewMatrix * viewPosition;
 }
