@@ -1,14 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import * as THREE from "three";
-    import vertexShader from "$lib/shaders/vertex.glsl";
+    import vertexShaderHead from "$lib/shaders/vertex_head.glsl";
+    import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
     import fragmentShader from "$lib/shaders/fragment.glsl";
+    import { defaultValue, insertID, values } from "$lib/projections/index";
 
 
     let m: {x: number, y: number} = {x: 0.5, y: 0.5};
     let mOffset: {x: number, y: number} = {x: 0, y: 0};
     let mIsDown: boolean = false;
     let transition = 0;
+    let projectionIndex = 0;
     let canvas: HTMLCanvasElement;
 
     let scene: THREE.Scene;
@@ -30,6 +33,41 @@
     onMount(()=>{
         createScene();
     })
+
+    $: updateShaders(projectionIndex);
+
+    function updateShaders(vertexShaderIndex: number) {
+        console.log('update shaders!!!');
+        if (!sphere || !sphere.material || !(sphere.material instanceof THREE.ShaderMaterial)) {
+            console.error("Sphere or material not initialized properly.");
+            return;
+        }
+
+        const updatedVertexShader = getVertexShader(vertexShaderIndex);
+        console.log(updatedVertexShader);
+
+        sphere.material.vertexShader = updatedVertexShader;
+        sphere.material.needsUpdate = true;
+    }
+
+    function getVertexShader(index: number) {
+        const projectionData = Object.assign({}, defaultValue, values[index]);
+
+        const fullVertexShader = vertexShaderHead + `
+        vec2 applyMapProjectionB(float a, float b) {
+            ${insertID(projectionData.projection, 'B')}
+            return vec2(x, y);
+        }
+        vec3 projectUVToPositionB(vec2 uv) {
+            ${insertID(projectionData.position, 'B')}
+        }
+        vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
+            ${insertID(projectionData.centerTransformation, 'B')}
+        }
+        ` + vertexShaderBody;
+
+        return fullVertexShader;
+    }
 
     function createScene() {
         scene = new THREE.Scene();
@@ -54,7 +92,7 @@
             }
         }
         const material = new THREE.ShaderMaterial({
-            vertexShader,
+            vertexShader: getVertexShader(projectionIndex),
             fragmentShader,
             uniforms
         });
@@ -114,6 +152,11 @@
 </script>
 
 <input type="range" min="0" max="1" step="0.01" bind:value={transition} on:input={onTransition} /> {transition}
+<select bind:value={projectionIndex}>
+    {#each values as option, i}
+      <option value={i}>{option.name}</option>
+    {/each}
+</select> {projectionIndex} {values[projectionIndex].name}
 <canvas 
     bind:this={canvas}
     on:mousemove={onMouseMove} 

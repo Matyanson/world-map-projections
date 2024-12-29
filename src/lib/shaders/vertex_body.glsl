@@ -1,31 +1,5 @@
-uniform vec2 cursorPosition;
-uniform float transition;
-
-out vec2 vUV;
-out vec3 fragPositionA;
-
-vec2 uvToSphericalCoords(vec2 uv) {
-    float a = (2.0 * uv.x - 1.0) * 3.14159265359;
-    float b = (uv.y - 0.5) * 3.14159265359;
-    return vec2(a, b);
-}
-
 vec3 projectUVToPositionA(vec2 uv) {
     return position;
-}
-
-vec2 applyMapProjectionB(float a, float b) {
-
-    float x = a;
-    float y = log(1.0 / cos(b) + tan(b));
-
-    return vec2(x, y);
-}
-
-vec3 projectUVToPositionB(vec2 uv) {
-    vec2 ab = uvToSphericalCoords(uv);
-    vec2 xy = applyMapProjectionB(ab.x, ab.y);
-    return vec3(xy, 1.0);
 }
 
 vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
@@ -51,12 +25,6 @@ vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
     );
 
     return rotX * rotY * vec4(position, 1.0);
-}
-
-vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
-    vec3 mappedCursor = projectUVToPositionB(cursor);
-    vec3 newPosition = position - vec3(mappedCursor.xy, 0.0);
-    return vec4(newPosition, 1.0);
 }
 
 void main() {
