@@ -61,7 +61,7 @@
         sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
 
-        camera.position.z = 2.0;
+        camera.position.z = 3.0;
     }
 
     function animate() {
@@ -106,14 +106,18 @@
         uniforms.transition.value = transition;
     }
 
-
+    function onWheel(e: WheelEvent) {
+        const direction = e.deltaY > 0 ? 1 : -1;
+        camera.translateZ(direction * 0.05);
+    }
 
 </script>
 
+<input type="range" min="0" max="1" step="0.01" bind:value={transition} on:input={onTransition} /> {transition}
 <canvas 
     bind:this={canvas}
     on:mousemove={onMouseMove} 
     on:mousedown={onMouseDown}
     on:mouseup={onMouseUp}
+    on:wheel|preventDefault={onWheel}
 ></canvas>
-<input type="range" min="0" max="1" step="0.01" bind:value={transition} on:input={onTransition} /> {transition}
