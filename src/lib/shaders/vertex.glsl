@@ -4,22 +4,36 @@ uniform float transition;
 out vec2 vUV;
 out vec3 fragPositionA;
 
-vec3 mapProjectionA(vec2 uv) {
+vec2 uvToSphericalCoords(vec2 uv) {
+    float a = (2.0 * uv.x - 1.0) * 3.14159265359;
+    float b = (uv.y - 0.5) * 3.14159265359;
+    return vec2(a, b);
+}
+
+vec3 projectUVToPositionA(vec2 uv) {
     return position;
 }
 
-vec3 mapProjectionB(vec2 uv) {
-    return vec3(uv * vec2(2.0, 1.0), 1.0);
+vec2 applyMapProjectionB(float a, float b) {
+
+    float x = a;
+    float y = b;
+
+    return vec2(x, y);
 }
 
+vec3 projectUVToPositionB(vec2 uv) {
+    vec2 ab = uvToSphericalCoords(uv);
+    vec2 xy = applyMapProjectionB(ab.x, ab.y);
+    return vec3(xy, 1.0);
+}
 
-mat4 getModelMatA(vec2 cursor) {
-    vec2 sphereOriginOffset = vec2(0.25, 0.5);
-    vec2 scaledCursor = (cursorPosition - sphereOriginOffset) * vec2(6.28318530718, 3.14159265359);
+mat4 getCursorCenteringMatrixA(vec2 cursor) {
+    vec2 sphereOriginOffset = vec2(-0.25, 0.0);
+    vec2 cursorOnSphere = uvToSphericalCoords(cursor - sphereOriginOffset);
 
-    float theta = scaledCursor.x; // Longitude
-    float phi = -scaledCursor.y; // Latitude (inverted for equirectangular mapping)
-
+    float theta = cursorOnSphere.x; // Longitude
+    float phi = -cursorOnSphere.y; // Latitude (inverted for equirectangular mapping)
 
     // Compute rotations
     mat4 rotX = mat4(
@@ -39,10 +53,9 @@ mat4 getModelMatA(vec2 cursor) {
     return rotX * rotY;
 }
 
-mat4 getModelMatB(vec2 cursor) {
+mat4 getCursorCenteringMatrixB(vec2 cursor) {
     // map cursor according to the map projection function
-    vec3 mappedCursor = mapProjectionB(cursor);
-
+    vec3 mappedCursor = projectUVToPositionB(cursor);
 
     // Compute translation
     mat4 translation = mat4(
@@ -56,11 +69,11 @@ mat4 getModelMatB(vec2 cursor) {
 }
 
 void main() {
-    vec3 mappedPositionA = mapProjectionA(uv);
-    vec3 mappedPositionB = mapProjectionB(uv);
+    vec3 mappedPositionA = projectUVToPositionA(uv);
+    vec3 mappedPositionB = projectUVToPositionB(uv);
 
-    mat4 mapModelMatA = getModelMatA(cursorPosition);
-    mat4 mapModelMatB = getModelMatB(cursorPosition);
+    mat4 mapModelMatA = getCursorCenteringMatrixA(cursorPosition);
+    mat4 mapModelMatB = getCursorCenteringMatrixB(cursorPosition);
 
     vUV = uv;
 
