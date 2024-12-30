@@ -3,14 +3,14 @@ import { get, writable } from "svelte/store";
 export function createMouseController(x: number, y: number) {
 
     const mouseState = writable({
-        x,
-        y,
         offset: { x: 0, y: 0 },
         isDown: false
     })
+    const position = writable({ x, y });
 
     function getCursorPosition() {
-        const { x, y, offset } = get(mouseState);
+        const { offset } = get(mouseState);
+        const { x, y } = get(position);
         return {
             x:      x + offset.x,
             y: 1 - (y + offset.y)
@@ -18,8 +18,8 @@ export function createMouseController(x: number, y: number) {
     }
 
     function onMouseMove(e: MouseEvent) {
-        mouseState.update((state) => {
-            if(!state.isDown) return state;
+        position.update((state) => {
+            if(!get(mouseState).isDown) return state;
 
             return {
                 ...state,
@@ -33,7 +33,8 @@ export function createMouseController(x: number, y: number) {
         if(e.button != 0) return;
 
         mouseState.update((state) => {
-            const { x, y, offset } = state;
+            const { offset } = state;
+            const { x, y } = get(position);
 
             const currX = -e.clientX / window.innerWidth;
             const currY = -e.clientY / window.innerHeight;
@@ -61,6 +62,7 @@ export function createMouseController(x: number, y: number) {
     }
 
     return {
+        position,
         mouseState,
         onMouseMove,
         onMouseDown,
