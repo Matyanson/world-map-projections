@@ -28,7 +28,7 @@ vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
 }
 
 void main() {
-    vUV = uv;
+    vUV = uv + textureOffset;
 
     vec3 mappedPositionA = projectUVToPositionA(uv);
     vec3 mappedPositionB = projectUVToPositionB(uv);

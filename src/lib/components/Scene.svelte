@@ -1,7 +1,7 @@
 <script lang="ts">
     import { values } from "$lib/projections";
     import { createSceneController } from "$lib/scene/scene";
-    import { mouse, zoom } from "$lib/scene/state";
+    import { mouse, onMouseDown, onMouseMove, onMouseUp, textureOffset, zoom } from "$lib/scene/state";
     import { onMount } from "svelte";
     import { get } from "svelte/store";
     
@@ -18,6 +18,10 @@
         mouse.position.subscribe((state) => {
             const cursor = mouse.getCursorPosition();
             sceneControler.updateCursorPosition(cursor.x, cursor.y);
+        });
+        textureOffset.position.subscribe((state) => {
+            const cursor = textureOffset.getCursorPosition();
+            sceneControler.updateOffsetPosition(cursor.x, cursor.y);
         });
     })
 
@@ -37,9 +41,9 @@
     
     <canvas width="650" height="500"
         bind:this={canvas}
-        on:mousemove={mouse.onMouseMove} 
-        on:mousedown={mouse.onMouseDown}
-        on:mouseup={mouse.onMouseUp}
+        on:mousemove={onMouseMove} 
+        on:mousedown={onMouseDown}
+        on:mouseup={onMouseUp}
         on:wheel|preventDefault={onWheel}
     ></canvas>
 </div>

@@ -4,7 +4,7 @@ import vertexShaderHead from "$lib/shaders/vertex_head.glsl";
 import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
 import fragmentShader from "$lib/shaders/fragment.glsl";
 import { get, writable } from "svelte/store";
-import { mapIndex, mouse, transition, zoom } from "./state";
+import { mapIndex, mouse, textureOffset, transition, zoom } from "./state";
 
 
 export function createSceneController() {
@@ -17,6 +17,9 @@ export function createSceneController() {
             value: THREE.Texture;
         },
         cursorPosition: {
+            value: THREE.Vector2;
+        },
+        textureOffset: {
             value: THREE.Vector2;
         },
         transition: {
@@ -44,6 +47,16 @@ export function createSceneController() {
         })
     }
 
+    function updateOffsetPosition(x: number, y: number) {
+        uniforms.update((state) => {
+            if(!state) return state;
+
+            state.textureOffset.value = new THREE.Vector2(x, y);
+
+            return state;
+        })
+    }
+
     function updateShaders(vertexShaderIndex: number, id: string) {
         sphere.update((state) => {
             console.log('update shaders!!!');
@@ -66,7 +79,8 @@ export function createSceneController() {
         sphere,
         initScene,
         updateShaders,
-        updateCursorPosition
+        updateCursorPosition,
+        updateOffsetPosition
     }
 }
 
@@ -117,7 +131,11 @@ function createScene(canvas: HTMLCanvasElement) {
 
 function getUniforms() {
     const cursor = mouse.getCursorPosition();
+    const offset = textureOffset.getCursorPosition();
     const globeTexture = new THREE.TextureLoader().load("earth_day.jpg");
+    // Set texture wrapping mode
+    globeTexture.wrapS = THREE.RepeatWrapping; // Horizontal wrapping (U)
+    globeTexture.wrapT = THREE.MirroredRepeatWrapping; // Vertical wrapping (V)
 
     return {
         globeTexture: {
@@ -125,6 +143,9 @@ function getUniforms() {
         },
         cursorPosition: {
             value: new THREE.Vector2(cursor.x, cursor.y)
+        },
+        textureOffset: {
+            value: new THREE.Vector2(offset.x, offset.y)
         },
         transition: {
             value: get(transition)

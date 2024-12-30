@@ -1,4 +1,5 @@
 uniform vec2 cursorPosition;
+uniform vec2 textureOffset;
 uniform float transition;
 
 out vec2 vUV;
