@@ -34,7 +34,7 @@ export function createSceneController() {
         uniforms.set(sceneData.uniforms);
     }
 
-    function updateMousePosition(x: number, y: number) {
+    function updateCursorPosition(x: number, y: number) {
         uniforms.update((state) => {
             if(!state) return state;
 
@@ -66,7 +66,7 @@ export function createSceneController() {
         sphere,
         initScene,
         updateShaders,
-        updateMousePosition
+        updateCursorPosition
     }
 }
 

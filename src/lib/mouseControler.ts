@@ -18,9 +18,8 @@ export function createMouseController(x: number, y: number) {
     }
 
     function onMouseMove(e: MouseEvent) {
+        if(!get(mouseState).isDown) return;
         position.update((state) => {
-            if(!get(mouseState).isDown) return state;
-
             return {
                 ...state,
                 x: -e.clientX / window.innerWidth,

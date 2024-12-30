@@ -18,7 +18,7 @@
 
         mouseController.position.subscribe((state) => {
             const cursor = mouseController.getCursorPosition();
-            sceneControler.updateMousePosition(cursor.x, cursor.y);
+            sceneControler.updateCursorPosition(cursor.x, cursor.y);
         })
     })
 
