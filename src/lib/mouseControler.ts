@@ -1,4 +1,5 @@
 import { get, writable } from "svelte/store";
+import { zoom } from "./scene/state";
 
 export function createMouseController(x: number, y: number) {
 
@@ -20,10 +21,11 @@ export function createMouseController(x: number, y: number) {
     function onMouseMove(e: MouseEvent) {
         if(!get(mouseState).isDown) return;
         position.update((state) => {
+            const scale = Math.pow(2, get(zoom));
             return {
                 ...state,
-                x: -e.clientX / window.innerWidth,
-                y: -e.clientY / window.innerHeight
+                x: scale * -e.clientX / window.innerWidth,
+                y: scale * -e.clientY / window.innerHeight
             }
         })
     }
@@ -37,13 +39,14 @@ export function createMouseController(x: number, y: number) {
 
             const currX = -e.clientX / window.innerWidth;
             const currY = -e.clientY / window.innerHeight;
+            const scale = Math.pow(2, get(zoom));
 
             return {
                 ...state,
                 // difference between last and curr coords
                 offset: {
-                    x: offset.x + x - currX,
-                    y: offset.y + y - currY
+                    x: offset.x + x - scale * currX,
+                    y: offset.y + y - scale * currY
                 },
                 isDown: true
             }

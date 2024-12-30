@@ -4,7 +4,7 @@ import vertexShaderHead from "$lib/shaders/vertex_head.glsl";
 import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
 import fragmentShader from "$lib/shaders/fragment.glsl";
 import { get, writable } from "svelte/store";
-import { mapIndex, mouse, transition } from "./state";
+import { mapIndex, mouse, transition, zoom } from "./state";
 
 
 export function createSceneController() {
@@ -44,12 +44,12 @@ export function createSceneController() {
         })
     }
 
-    function updateShaders(vertexShaderIndex: number) {
+    function updateShaders(vertexShaderIndex: number, id: string) {
         sphere.update((state) => {
             console.log('update shaders!!!');
             if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
     
-            const updatedVertexShader = getVertexShader(vertexShaderIndex);
+            const updatedVertexShader = getVertexShader(vertexShaderIndex, id);
             console.log(updatedVertexShader);
     
             state.material.vertexShader = updatedVertexShader;
@@ -74,17 +74,17 @@ export function createSceneController() {
 
 function createScene(canvas: HTMLCanvasElement) {
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    const camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.0001, 1000 );
     const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 
-    renderer.setSize(window.innerWidth-1, window.innerHeight-1);
+    renderer.setSize(canvas.width, canvas.height);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setAnimationLoop(animate);
 
     const geometry = new THREE.SphereGeometry(1, 50, 50);
     const uniforms = getUniforms()
     const material = new THREE.ShaderMaterial({
-        vertexShader: getVertexShader(get(mapIndex)),
+        vertexShader: getVertexShader(get(mapIndex), 'B'),
         fragmentShader,
         uniforms
     });
@@ -95,6 +95,10 @@ function createScene(canvas: HTMLCanvasElement) {
 
     transition.subscribe((t) => {
         uniforms.transition.value = t;
+    })
+
+    zoom.subscribe((z) => {
+        camera.position.z = 1.0001 + Math.pow(2, z);
     })
 
     function animate() {
@@ -128,19 +132,19 @@ function getUniforms() {
     }
 }
 
-function getVertexShader(index: number) {
+function getVertexShader(index: number, id: string) {
     const projectionData = Object.assign({}, defaultValue, values[index]);
 
     const fullVertexShader = vertexShaderHead + `
     vec2 applyMapProjectionB(float a, float b) {
-        ${insertID(projectionData.projection, 'B')}
+        ${insertID(projectionData.projection, id)}
         return vec2(x, y);
     }
     vec3 projectUVToPositionB(vec2 uv) {
-        ${insertID(projectionData.position, 'B')}
+        ${insertID(projectionData.position, id)}
     }
     vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
-        ${insertID(projectionData.centerTransformation, 'B')}
+        ${insertID(projectionData.centerTransformation, id)}
     }
     ` + vertexShaderBody;
 
