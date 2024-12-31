@@ -4,7 +4,7 @@ import vertexShaderHead from "$lib/shaders/vertex_head.glsl";
 import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
 import fragmentShader from "$lib/shaders/fragment.glsl";
 import { get, writable } from "svelte/store";
-import { mapIndex, mouse, centralPoint, transition, zoom } from "./state";
+import { mouse, centralPoint, transition, zoom } from "./state";
 
 
 export function createSceneController() {
@@ -57,6 +57,21 @@ export function createSceneController() {
         })
     }
 
+    function setCustomProjection(code: string, id: string) {
+        sphere.update((state) => {
+            console.log('update shaders!!!');
+            if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
+    
+            const updatedVertexShader = getCustomVertexShader(code, id);
+            console.log(updatedVertexShader);
+    
+            state.material.vertexShader = updatedVertexShader;
+            state.material.needsUpdate = true;
+
+            return state;
+        })
+    }
+
     function updateShaders(vertexShaderIndex: number, id: string) {
         sphere.update((state) => {
             console.log('update shaders!!!');
@@ -79,6 +94,7 @@ export function createSceneController() {
         sphere,
         initScene,
         updateShaders,
+        setCustomProjection,
         updateCursorPosition,
         updateCenterPosition
     }
@@ -98,7 +114,7 @@ function createScene(canvas: HTMLCanvasElement) {
     const geometry = new THREE.SphereGeometry(1, 50, 50);
     const uniforms = getUniforms()
     const material = new THREE.ShaderMaterial({
-        vertexShader: getVertexShader(get(mapIndex), 'B'),
+        vertexShader: getVertexShader(0, 'B'),
         fragmentShader,
         uniforms
     });
@@ -159,6 +175,25 @@ function getVertexShader(index: number, id: string) {
     const fullVertexShader = vertexShaderHead + `
     vec2 applyMapProjectionB(float a, float b) {
         ${insertID(projectionData.projection, id)}
+        return vec2(x, y);
+    }
+    vec3 projectUVToPositionB(vec2 uv) {
+        ${insertID(projectionData.position, id)}
+    }
+    vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
+        ${insertID(projectionData.centerTransformation, id)}
+    }
+    ` + vertexShaderBody;
+
+    return fullVertexShader;
+}
+
+function getCustomVertexShader(projection: string, id: string) {
+    const projectionData = Object.assign({}, defaultValue);
+
+    const fullVertexShader = vertexShaderHead + `
+    vec2 applyMapProjectionB(float a, float b) {
+        ${insertID(projection, id)}
         return vec2(x, y);
     }
     vec3 projectUVToPositionB(vec2 uv) {

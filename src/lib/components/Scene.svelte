@@ -5,15 +5,19 @@
     import { onMount } from "svelte";
     import { get } from "svelte/store";
     
-    let mapIndex = 0;
+    export let mapIndex = 0;
+    let code = "";
     let canvas: HTMLCanvasElement;
     const sceneControler = createSceneController();
 
     $: sceneControler.updateShaders(mapIndex, 'B');
+    $: code = values[mapIndex].projection;
 
     onMount(() => {
         console.log("onMount");
         sceneControler.initScene(canvas);
+        sceneControler.updateShaders(mapIndex, 'B');
+        code = values[mapIndex].projection;
 
         mouse.position.subscribe((state) => {
             const cursor = mouse.getCursorPosition();
@@ -28,6 +32,10 @@
     function onWheel(e: WheelEvent) {
         const direction = e.deltaY > 0 ? 1 : -1;
         zoom.update(z => z + direction * 0.1);
+    }
+
+    function updateProjection() {
+        sceneControler.setCustomProjection(code, 'B');
     }
 
 </script>
@@ -46,11 +54,17 @@
         on:mouseup={onMouseUp}
         on:wheel|preventDefault={onWheel}
     ></canvas>
+    <textarea bind:value={code}></textarea>
+    <button on:click={updateProjection}>Update Projection</button>
 </div>
 
 <style>
     .scene {
         display: flex;
         flex-flow: column;
+    }
+
+    .scene textarea {
+        height: 200px;
     }
 </style>
