@@ -5,12 +5,12 @@ import { writable } from "svelte/store";
 export const transition = writable(0);
 export const mapIndex = writable(0);
 export const mouse = createMouseController(0.5, 0.5);
-export const textureOffset = createMouseController(0, 1);
+export const centralPoint = createMouseController(0.5, 0.5);
 export const zoom = writable(1.0);
 
 
 
 // helper functions
-export const onMouseMove = (e: MouseEvent) => e.shiftKey ? textureOffset.onMouseMove(e) : mouse.onMouseMove(e);
-export const onMouseDown = (e: MouseEvent) => e.shiftKey ? textureOffset.onMouseDown(e) : mouse.onMouseDown(e);
-export const onMouseUp =   (e: MouseEvent) => e.shiftKey ? textureOffset.onMouseUp(e)   : mouse.onMouseUp(e);
+export const onMouseMove = (e: MouseEvent) => e.shiftKey ? centralPoint.onMouseMove(e) : mouse.onMouseMove(e);
+export const onMouseDown = (e: MouseEvent) => e.shiftKey ? centralPoint.onMouseDown(e) : mouse.onMouseDown(e);
+export const onMouseUp =   (e: MouseEvent) => e.shiftKey ? centralPoint.onMouseUp(e)   : mouse.onMouseUp(e);

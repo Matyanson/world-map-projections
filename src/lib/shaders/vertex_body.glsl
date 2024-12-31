@@ -27,8 +27,39 @@ vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
     return rotX * rotY * vec4(position, 1.0);
 }
 
+vec2 sphericalRotation(vec2 ab, vec2 offsetAB) {
+    float lambda = ab.x;  // Longitude (λ)
+    float phi = ab.y;     // Latitude (φ)
+
+    float lambdaOffset = offsetAB.x; // Longitude offset (λ_offset)
+    float phiOffset = offsetAB.y;    // Latitude offset (φ_offset)
+
+    // Calculate rotated spherical coordinates
+    float deltaLambda = lambda + lambdaOffset;
+
+    float newLambda = atan(
+        cos(phi) * sin(deltaLambda),
+        cos(phiOffset) * cos(phi) * cos(deltaLambda) - sin(phiOffset) * sin(phi)
+    );
+
+    float newPhi = asin(
+        sin(phi) * cos(phiOffset) + cos(phi) * sin(phiOffset) * cos(deltaLambda)
+    );
+
+    return vec2(newLambda, newPhi);
+}
+
+vec2 offsetUV(vec2 uv, vec2 offset) {
+    vec2 uvSphere = uvToSphericalCoords(uv);
+    vec2 offsetSphere = uvToSphericalCoords(offset);
+
+    vec2 ab = sphericalRotation(uvSphere, offsetSphere);
+
+    return sphericalCoordsToUV(ab);
+}
+
 void main() {
-    vUV = uv + textureOffset;
+    vUV = offsetUV(uv, centralPoint);
 
     vec3 mappedPositionA = projectUVToPositionA(uv);
     vec3 mappedPositionB = projectUVToPositionB(uv);

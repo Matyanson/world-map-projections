@@ -4,7 +4,7 @@ import vertexShaderHead from "$lib/shaders/vertex_head.glsl";
 import vertexShaderBody from "$lib/shaders/vertex_body.glsl";
 import fragmentShader from "$lib/shaders/fragment.glsl";
 import { get, writable } from "svelte/store";
-import { mapIndex, mouse, textureOffset, transition, zoom } from "./state";
+import { mapIndex, mouse, centralPoint, transition, zoom } from "./state";
 
 
 export function createSceneController() {
@@ -19,7 +19,7 @@ export function createSceneController() {
         cursorPosition: {
             value: THREE.Vector2;
         },
-        textureOffset: {
+        centralPoint: {
             value: THREE.Vector2;
         },
         transition: {
@@ -47,11 +47,11 @@ export function createSceneController() {
         })
     }
 
-    function updateOffsetPosition(x: number, y: number) {
+    function updateCenterPosition(x: number, y: number) {
         uniforms.update((state) => {
             if(!state) return state;
 
-            state.textureOffset.value = new THREE.Vector2(x, y);
+            state.centralPoint.value = new THREE.Vector2(x, y);
 
             return state;
         })
@@ -80,7 +80,7 @@ export function createSceneController() {
         initScene,
         updateShaders,
         updateCursorPosition,
-        updateOffsetPosition
+        updateCenterPosition
     }
 }
 
@@ -131,7 +131,7 @@ function createScene(canvas: HTMLCanvasElement) {
 
 function getUniforms() {
     const cursor = mouse.getCursorPosition();
-    const offset = textureOffset.getCursorPosition();
+    const center = centralPoint.getCursorPosition();
     const globeTexture = new THREE.TextureLoader().load("earth_day.jpg");
     // Set texture wrapping mode
     globeTexture.wrapS = THREE.RepeatWrapping; // Horizontal wrapping (U)
@@ -144,8 +144,8 @@ function getUniforms() {
         cursorPosition: {
             value: new THREE.Vector2(cursor.x, cursor.y)
         },
-        textureOffset: {
-            value: new THREE.Vector2(offset.x, offset.y)
+        centralPoint: {
+            value: new THREE.Vector2(center.x, center.y)
         },
         transition: {
             value: get(transition)

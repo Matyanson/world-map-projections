@@ -1,7 +1,7 @@
 <script lang="ts">
     import { values } from "$lib/projections";
     import { createSceneController } from "$lib/scene/scene";
-    import { mouse, onMouseDown, onMouseMove, onMouseUp, textureOffset, zoom } from "$lib/scene/state";
+    import { mouse, onMouseDown, onMouseMove, onMouseUp, centralPoint, zoom } from "$lib/scene/state";
     import { onMount } from "svelte";
     import { get } from "svelte/store";
     
@@ -19,9 +19,9 @@
             const cursor = mouse.getCursorPosition();
             sceneControler.updateCursorPosition(cursor.x, cursor.y);
         });
-        textureOffset.position.subscribe((state) => {
-            const cursor = textureOffset.getCursorPosition();
-            sceneControler.updateOffsetPosition(cursor.x, cursor.y);
+        centralPoint.position.subscribe((state) => {
+            const cursor = centralPoint.getCursorPosition();
+            sceneControler.updateCenterPosition(cursor.x, cursor.y);
         });
     })
 
