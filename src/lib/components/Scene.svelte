@@ -66,5 +66,11 @@
 
     .scene textarea {
         height: 200px;
+        background-color: #333;
+        color: #fff;
+    }
+
+    canvas {
+        -webkit-user-drag: none;
     }
 </style>
