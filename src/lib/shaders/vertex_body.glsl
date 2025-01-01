@@ -72,5 +72,9 @@ void main() {
     // Interpolate between positionA and positionB
     vec4 viewPosition = mix(positionA, positionB, transition);
 
+    vec3 normalA = positionA.xyz;
+    vec3 normalB = vec3(0.0, 0.0, 1.0);
+    vNormal = mix(normalA, normalB, transition);
+
     gl_Position = projectionMatrix * viewMatrix * viewPosition;
 }

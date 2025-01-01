@@ -158,7 +158,7 @@ function getStars() {
     for (let i = 0; i < 1000; i++) {
         const x = Math.random() * 2000 - 1000;
         const y = Math.random() * 2000 - 1000;
-        const z = Math.random() * -900 - 100;
+        const z = Math.random() * -800 - 100;
         vb.push(x, y, z);
     }
 

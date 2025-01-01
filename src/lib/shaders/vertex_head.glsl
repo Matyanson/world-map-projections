@@ -3,6 +3,7 @@ uniform vec2 centralPoint;
 uniform float transition;
 
 out vec2 vUV;
+out vec3 vNormal;
 out vec3 fragPositionA;
 
 vec2 uvToSphericalCoords(vec2 uv) {
