@@ -111,6 +111,7 @@ function createScene(canvas: HTMLCanvasElement) {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setAnimationLoop(animate);
 
+    // SPHERE
     const geometry = new THREE.SphereGeometry(1, 50, 50);
     const uniforms = getUniforms()
     const material = new THREE.ShaderMaterial({
@@ -121,6 +122,10 @@ function createScene(canvas: HTMLCanvasElement) {
     const sphere = new THREE.Mesh(geometry, material);
     scene.add(sphere);
 
+    // STARS
+    scene.add(getStars());
+
+    // SETUP
     camera.position.z = 3.0;
 
     transition.subscribe((t) => {
@@ -142,6 +147,27 @@ function createScene(canvas: HTMLCanvasElement) {
         sphere,
         uniforms
     }
+}
+
+function getStars() {
+    const geometry = new THREE.BufferGeometry();
+    const material = new THREE.PointsMaterial({ color: 0xfffffffff });
+    const stars = new THREE.Points(geometry, material);
+
+    const vb = [];
+    for (let i = 0; i < 1000; i++) {
+        const x = Math.random() * 2000 - 1000;
+        const y = Math.random() * 2000 - 1000;
+        const z = Math.random() * -900 - 100;
+        vb.push(x, y, z);
+    }
+
+    geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute(vb, 3)
+    );
+
+    return stars;
 }
 
 
