@@ -54,6 +54,10 @@
         on:mouseup={onMouseUp}
         on:wheel|preventDefault={onWheel}
     ></canvas>
+    <p class="info">
+        a = longitude in radians &nbsp;[-π, π]<br>
+        b = latitude in radians &emsp;[-π/2, π/2]
+    </p>
     <textarea bind:value={code}></textarea>
     <button on:click={updateProjection}>Update Projection</button>
 </div>
