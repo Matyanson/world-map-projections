@@ -1,3 +1,2 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-<a href="/scene">scene</a>
+<h1>World-Map-Projections</h1>
+<a href="/scene">open editor</a>
