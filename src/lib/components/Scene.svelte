@@ -3,20 +3,19 @@
     import { createSceneController } from "$lib/scene/scene";
     import { mouse, onMouseDown, onMouseMove, onMouseUp, centralPoint, zoom } from "$lib/scene/state";
     import { onMount } from "svelte";
-    import { get } from "svelte/store";
     
-    export let mapIndex = 0;
+    export let mapIndexA = 0;
+    export let mapIndexB = 0;
     let code = "";
     let canvas: HTMLCanvasElement;
     const sceneControler = createSceneController();
 
-    $: sceneControler.updateShaders(mapIndex, 'B');
-    $: code = values[mapIndex].projection;
+    $: sceneControler.updateShaders(mapIndexA, mapIndexB);
+    $: code = values[mapIndexA].projection;
 
     onMount(() => {
-        sceneControler.initScene(canvas);
-        sceneControler.updateShaders(mapIndex, 'B');
-        code = values[mapIndex].projection;
+        sceneControler.initScene(canvas, mapIndexA, mapIndexB);
+        code = values[mapIndexA].projection;
 
         mouse.position.subscribe((state) => {
             const cursor = mouse.getCursorPosition();
@@ -33,19 +32,13 @@
         zoom.update(z => z + direction * 0.1);
     }
 
-    function updateProjection() {
-        sceneControler.setCustomProjection(code, 'B');
+    function updateProjection(key: string) {
+        sceneControler.setCustomProjection(code, key);
     }
 
 </script>
 
-<div class="scene">
-    <select bind:value={mapIndex}>
-        {#each values as option, i}
-          <option value={i}>{option.name}</option>
-        {/each}
-    </select> {mapIndex} {values[mapIndex].name}
-    
+<div class="scene">    
     <canvas width="650" height="500"
         bind:this={canvas}
         on:mousemove={onMouseMove} 
@@ -58,7 +51,7 @@
         b = latitude in radians &emsp;[-π/2, π/2]
     </p>
     <textarea bind:value={code}></textarea>
-    <button on:click={updateProjection}>Update Projection</button>
+    <button on:click={() => updateProjection('A')}>Update Projection</button>
 </div>
 
 <style>

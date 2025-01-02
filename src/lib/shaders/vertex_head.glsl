@@ -4,7 +4,7 @@ uniform float transition;
 
 out vec2 vUV;
 out vec3 vNormal;
-out vec3 fragPositionA;
+out vec3 fragPositionGlobe;
 
 vec2 uvToSphericalCoords(vec2 uv) {
     float a = (2.0 * uv.x - 1.0) * 3.14159265359;

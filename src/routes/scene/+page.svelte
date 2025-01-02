@@ -1,13 +1,14 @@
 <script lang="ts">
     import Scene from "$lib/components/Scene.svelte";
-import { transition } from "$lib/scene/state";
+    import SceneNavbar from "$lib/components/SceneNavbar.svelte";
+    import { mapIndex1, mapIndex2 } from "$lib/scene/state";
 
 </script>
 
-globe - map transition: <input type="range" min="0" max="1" step="0.01" bind:value={$transition} /> {$transition}
+<SceneNavbar />
 <div class="display">
-    <Scene mapIndex={1} />
-    <Scene />
+    <Scene mapIndexA={$mapIndex1} mapIndexB={$mapIndex2} />
+    <Scene mapIndexA={$mapIndex2} mapIndexB={$mapIndex1} />
 </div>
 
 <style>

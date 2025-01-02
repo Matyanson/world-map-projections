@@ -27,8 +27,8 @@ export function createSceneController() {
         }
     }>();
 
-    function initScene(canvas: HTMLCanvasElement) {
-        const sceneData = createScene(canvas);
+    function initScene(canvas: HTMLCanvasElement, mapIndex1: number, mapIndex2: number) {
+        const sceneData = createScene(canvas, mapIndex1, mapIndex2);
 
         scene.set(sceneData.scene);
         renderer.set(sceneData.renderer);
@@ -70,11 +70,13 @@ export function createSceneController() {
         })
     }
 
-    function updateShaders(vertexShaderIndex: number, id: string) {
+    function updateShaders(mapIndex1: number, mapIndex2: number) {
         sphere.update((state) => {
             if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
     
-            const updatedVertexShader = getVertexShader(vertexShaderIndex, id);
+            const updatedVertexShader = getVertexShader(mapIndex1, mapIndex2);
+
+            console.log(updatedVertexShader);
     
             state.material.vertexShader = updatedVertexShader;
             state.material.needsUpdate = true;
@@ -98,7 +100,7 @@ export function createSceneController() {
 
 // util functions
 
-function createScene(canvas: HTMLCanvasElement) {
+function createScene(canvas: HTMLCanvasElement, mapIndex1: number, mapIndex2: number) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.0001, 1000 );
     const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
@@ -111,7 +113,7 @@ function createScene(canvas: HTMLCanvasElement) {
     const geometry = new THREE.SphereGeometry(1, 50, 50);
     const uniforms = getUniforms()
     const material = new THREE.ShaderMaterial({
-        vertexShader: getVertexShader(0, 'B'),
+        vertexShader: getVertexShader(mapIndex1, mapIndex2),
         fragmentShader,
         uniforms
     });
@@ -191,23 +193,32 @@ function getUniforms() {
     }
 }
 
-function getVertexShader(index: number, id: string) {
+function getVertexShader(index1: number, index2: number) {
+    const fullVertexShader = vertexShaderHead + 
+    getVertexShaderFunctions(index1, 'A') +
+    getVertexShaderFunctions(index2, 'B') +
+    vertexShaderBody;
+
+    return fullVertexShader;
+}
+
+function getVertexShaderFunctions(index: number, id: string) {
     const projectionData = Object.assign({}, defaultValue, values[index]);
 
-    const fullVertexShader = vertexShaderHead + `
-    vec2 applyMapProjectionB(float a, float b) {
+    const result = `
+    vec2 applyMapProjection${id}(float a, float b) {
         ${insertID(projectionData.projection, id)}
         return vec2(x, y);
     }
-    vec3 projectUVToPositionB(vec2 uv) {
+    vec3 projectUVToPosition${id}(vec2 uv) {
         ${insertID(projectionData.position, id)}
     }
-    vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
+    vec4 applyCursorCentering${id}(vec3 position, vec2 cursor) {
         ${insertID(projectionData.centerTransformation, id)}
     }
-    ` + vertexShaderBody;
+    `;
 
-    return fullVertexShader;
+    return result;
 }
 
 function getCustomVertexShader(projection: string, id: string) {

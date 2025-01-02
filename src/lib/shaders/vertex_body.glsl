@@ -1,8 +1,5 @@
-vec3 projectUVToPositionA(vec2 uv) {
-    return position;
-}
 
-vec4 applyCursorCenteringA(vec3 position, vec2 cursor) {
+vec4 applyCursorCenteringGlobe(vec3 position, vec2 cursor) {
     vec2 sphereOriginOffset = vec2(-0.25, 0.0);
     vec2 cursorOnSphere = uvToSphericalCoords(cursor - sphereOriginOffset);
 
@@ -66,14 +63,15 @@ void main() {
 
     vec4 positionA = applyCursorCenteringA(mappedPositionA, cursorPosition);
     vec4 positionB = applyCursorCenteringB(mappedPositionB, cursorPosition);
+    vec4 positionGlobe = applyCursorCenteringGlobe(position, cursorPosition);
 
-    fragPositionA = vec3(positionA);
+    fragPositionGlobe = vec3(positionGlobe);
 
     // Interpolate between positionA and positionB
     vec4 viewPosition = mix(positionA, positionB, transition);
 
     vec3 normalA = positionA.xyz;
-    vec3 normalB = vec3(0.0, 0.0, 1.0);
+    vec3 normalB = positionB.xyz;
     vNormal = mix(normalA, normalB, transition);
 
     gl_Position = projectionMatrix * viewMatrix * viewPosition;
