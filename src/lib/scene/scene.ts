@@ -59,11 +59,9 @@ export function createSceneController() {
 
     function setCustomProjection(code: string, id: string) {
         sphere.update((state) => {
-            console.log('update shaders!!!');
             if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
     
             const updatedVertexShader = getCustomVertexShader(code, id);
-            console.log(updatedVertexShader);
     
             state.material.vertexShader = updatedVertexShader;
             state.material.needsUpdate = true;
@@ -74,11 +72,9 @@ export function createSceneController() {
 
     function updateShaders(vertexShaderIndex: number, id: string) {
         sphere.update((state) => {
-            console.log('update shaders!!!');
             if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
     
             const updatedVertexShader = getVertexShader(vertexShaderIndex, id);
-            console.log(updatedVertexShader);
     
             state.material.vertexShader = updatedVertexShader;
             state.material.needsUpdate = true;

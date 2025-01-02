@@ -14,7 +14,6 @@
     $: code = values[mapIndex].projection;
 
     onMount(() => {
-        console.log("onMount");
         sceneControler.initScene(canvas);
         sceneControler.updateShaders(mapIndex, 'B');
         code = values[mapIndex].projection;
