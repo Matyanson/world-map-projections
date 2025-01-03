@@ -57,11 +57,12 @@ export function createSceneController() {
         })
     }
 
-    function setCustomProjection(code: string, id: string) {
+    function setCustomProjection(code: string, mapIndex2: number) {
         sphere.update((state) => {
             if (!state || !(state.material instanceof THREE.ShaderMaterial)) return state;
     
-            const updatedVertexShader = getCustomVertexShader(code, id);
+            const updatedVertexShader = getCustomVertexShader(code, mapIndex2);
+            console.log(updatedVertexShader);
     
             state.material.vertexShader = updatedVertexShader;
             state.material.needsUpdate = true;
@@ -221,21 +222,30 @@ function getVertexShaderFunctions(index: number, id: string) {
     return result;
 }
 
-function getCustomVertexShader(projection: string, id: string) {
+function getCustomVertexShader(projection: string, index2: number) {
+    const fullVertexShader = vertexShaderHead + 
+    getCustomVertexShaderFunctions(projection, 'A') +
+    getVertexShaderFunctions(index2, 'B') +
+    vertexShaderBody;
+
+    return fullVertexShader;
+}
+
+function getCustomVertexShaderFunctions(projection: string, id: string) {
     const projectionData = Object.assign({}, defaultValue);
 
-    const fullVertexShader = vertexShaderHead + `
-    vec2 applyMapProjectionB(float a, float b) {
+    const result = `
+    vec2 applyMapProjection${id}(float a, float b) {
         ${insertID(projection, id)}
         return vec2(x, y);
     }
-    vec3 projectUVToPositionB(vec2 uv) {
+    vec3 projectUVToPosition${id}(vec2 uv) {
         ${insertID(projectionData.position, id)}
     }
-    vec4 applyCursorCenteringB(vec3 position, vec2 cursor) {
+    vec4 applyCursorCentering${id}(vec3 position, vec2 cursor) {
         ${insertID(projectionData.centerTransformation, id)}
     }
-    ` + vertexShaderBody;
+    `;
 
-    return fullVertexShader;
+    return result;
 }

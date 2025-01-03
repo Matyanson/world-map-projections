@@ -32,8 +32,8 @@
         zoom.update(z => z + direction * 0.1);
     }
 
-    function updateProjection(key: string) {
-        sceneControler.setCustomProjection(code, key);
+    function updateProjection() {
+        sceneControler.setCustomProjection(code, mapIndexB);
     }
 
 </script>
@@ -51,7 +51,7 @@
         b = latitude in radians &emsp;[-π/2, π/2]
     </p>
     <textarea bind:value={code}></textarea>
-    <button on:click={() => updateProjection('A')}>Update Projection</button>
+    <button on:click={updateProjection}>Update Projection</button>
 </div>
 
 <style>
