@@ -87,4 +87,12 @@ export const values: MapProjectionCode[] = [
         float x = a;
         float y = sin(b);`
     },
+    {
+        name: 'Square Equal Area',
+        projection: `
+        float sqrtPI = 1.77245385091;
+        
+        float x = a / sqrtPI;
+        float y = sqrtPI * sin(b);`
+    },
 ]
