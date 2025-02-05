@@ -95,4 +95,13 @@ export const values: MapProjectionCode[] = [
         float x = a / sqrtPI;
         float y = sqrtPI * sin(b);`
     },
+    {
+        name: '2:1 Equal Area',
+        projection: `
+        float xScale = 0.7978845608; // sqrt(2/PI)
+        float yScale = 1.2533141373; // sqrt(2/PI) * (PI/2)
+
+        float x = xScale * a;
+        float y = yScale * sin(b);`
+    },
 ]
