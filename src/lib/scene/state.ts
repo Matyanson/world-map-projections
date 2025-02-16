@@ -3,6 +3,8 @@ import { writable } from "svelte/store";
 
 // values shared by all scenes
 export const transition = writable(0);
+export const tRot = writable(0);
+export const tTrans = writable(0);
 export const mouse = createMouseController(0.5, 0.5);
 export const centralPoint = createMouseController(0.5, 0.5);
 export const zoom = writable(1.0);
